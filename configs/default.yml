@@ -1,0 +1,80 @@
+train:
+  epochs: 100
+  batch_size: 16
+  mode: ef # ef|as
+  seed: 0
+  visualize: True
+
+  wandb_run_name: <wandb_run_name>
+  wandb_mode: online
+  wandb_log_steps: 1000 # Log every n steps
+  wandb_group_name: <wandb_group_name> # bunch multiple runs into a group
+  wandb_entity: <wandb_user>
+  use_wandb: False
+
+  optimizer:
+    lr: 0.00001
+    weight_decay: 0.000001
+
+    # The following are only used during proto training
+    add_on_layers_lr: 0.002
+    prototype_vectors_lr: 0.002
+    last_layer_lr: 0.000001
+
+  scheduler:
+    patience: 10
+    threshold: 0.01
+    min_lr: 0.0000001
+
+  criterion:
+    attn_lambda: 0.0
+    frame_lambda: 0.0
+    classification_lambda: 0.0
+
+  evaluator:
+    standards: ["r2", "mae"] # Can include mae, r2, f1, acc
+    eval_metric: r2 # Must be one of values specified in standards
+    maximize: True
+
+model:
+  checkpoint_path: # Must be specified for testing. Optional for training.
+
+  # STE Config
+  patches: [16, 16] # Size of each patch in the image
+  spatial_num_layers: 12
+  spatial_mlp_dim: 3072
+  spatial_num_heads: 12
+  spatial_aggr_method: mean
+  spatial_hidden_size: 768
+  spatial_dropout_rate: 0.2
+  pretrained_patch_encoder_path: # Will use pretrained transformer if specified
+
+  # TTE Config
+  temporal_num_layers: 2
+  temporal_mlp_dim: 128
+  temporal_num_heads: 4
+  temporal_aggr_method: mean
+  temporal_dropout_rate: 0.2
+  temporal_hidden_size: 600
+
+  # VTE Config
+  vid_num_layers: 2
+  vid_mlp_dim: 256
+  vid_num_heads: 4
+  vid_aggr_method: mean
+  vid_dropout_rate: 0.2
+  vid_hidden_size: 200
+
+  output_dropout_rate: 0.2
+
+  use_ppnet: False # Applying the prototype layer/not
+
+data:
+  name: echonet # as|echonet|biplane
+  dataset_path: <path_to_dataset>
+  frame_size: 224
+  max_frames: 64 # Number of samples prior to subsampling
+  n_sampled_frames: 32 # Number of frame to subsample
+  max_clips: 16 # Number of back to back clips to extract per video
+  mean: 0.12922 # for echonet: 0.12922750413417816
+  std: 0.19023 # for echonet: 0.1902375221252441
